@@ -1,0 +1,22 @@
+@font-face {
+    font-family: "PublicSans";
+    src: url('PublicSans-Roman-VF.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: "GenEx";
+    src: url("GenJyuuGothicX-ExtraLight.ttf");
+}
+@font-face {
+    font-family: "GenLight";
+    src: url("GenJyuuGothicX-ExtraLight.ttf");
+}
+@font-face {
+    font-family: "GenNormal";
+    src: url("GenJyuuGothicX-Normal.ttf");
+}
+@font-face {
+    font-family: "YouYuan";
+    src: url("SIMYOU.TTF");
+}
