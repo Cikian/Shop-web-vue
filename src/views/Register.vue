@@ -16,49 +16,52 @@
                   ref="file"
                   :preview-full-image="false"
                   accept="image/*"
-                   />
+    />
 
 
     <!-- 可以使用 CellGroup 作为容器 -->
     <div class="register_form">
-      <van-cell-group inset>
-        <van-field v-model="params.userName"
-                   label="用户名"
-                   left-icon="user-circle-o"
-                   right-icon="warning-o"
-                   :rules="[{ required: true, message: '请填写用户名' },{pattern: /^[a-zA-Z0-9_-]{6,16}$/, message: '用户名为长度在6-16位的字母数字组合，且不能包含特殊符号'}]"
-                   placeholder="请输入用户名"/>
-        <van-field v-model="params.nickName"
-                   label="昵称"
-                   left-icon="user-circle-o"
-                   right-icon="warning-o"
-                   placeholder="请输入昵称"/>
-        <van-field v-model="params.password"
-                   clearable
-                   label="密码"
-                   left-icon="eye-o"
-                   type="password"
-                   :rules="[{ required: true, message: '请填写密码'}]"
-                   placeholder="请输入密码"/>
-        <van-field v-model="params.password2"
-                   clearable
-                   label="确认密码"
-                   left-icon="eye-o"
-                   placeholder="请再输入一遍密码"
-                   type="password"
-                   :rules="[{ required: true, message: '请再次填写密码' }]"
-                   @change="change"/>
-        <van-field v-model="params.email"
-                   clearable label="邮箱"
-                   left-icon="envelop-o"
-                   type="email"
-                   placeholder="请输入邮箱"/>
-        <van-field v-model="params.phone"
-                   type="tel"
-                   clearable
-                   label="电话号码"
-                   left-icon="phone-o"
-                   placeholder="请输入正确11位电话号码"/>
+      <van-form>
+        <van-cell-group inset>
+          <van-field v-model="params.userName"
+                     label="用户名"
+                     left-icon="user-circle-o"
+                     placeholder="请输入用户名"
+                     :rules="[{ required: true, message: '请填写用户名' },{pattern: /^[a-zA-Z0-9_-]{6,16}$/, message: '用户名为长度在6-16位的字母数字组合，且不能包含特殊符号'}]"
+          ></van-field>
+          <van-field v-model="params.nickName"
+                     label="昵称"
+                     left-icon="user-circle-o"
+                     placeholder="请输入昵称，最大长度为16个字符"
+          />
+          <van-field v-model="params.password"
+                     clearable
+                     label="密码"
+                     left-icon="eye-o"
+                     type="password"
+                     :rules="[{ required: true, message: '请填写密码'}]"
+                     placeholder="请输入密码"/>
+          <van-field v-model="params.password2"
+                     clearable
+                     label="确认密码"
+                     left-icon="eye-o"
+                     placeholder="请再输入一遍密码"
+                     type="password"
+                     :rules="[{ required: true, message: '请再次填写密码' }]"
+                     @change="change"/>
+          <van-field v-model="params.email"
+                     clearable label="邮箱"
+                     left-icon="envelop-o"
+                     type="email"
+                     placeholder="请输入邮箱"
+                      :rules="[{ required: true, message: '请填写邮箱' },{pattern: /^\w{1,64}@[a-z0-9\-]{1,256}(\.[a-z]{2,6}){1,2}$/, message: '邮箱格式不正确'}]"
+          />
+          <van-field v-model="params.phone"
+                     type="tel"
+                     clearable
+                     label="电话号码"
+                     left-icon="phone-o"
+                     placeholder="请输入正确11位电话号码"/>
 
         <!--      <van-field v-model="sms" center clearable left-icon="comment-o" label="短信验证码" placeholder="请输入短信验证码">-->
         <!--        <template #button>-->
@@ -66,28 +69,29 @@
         <!--        </template>-->
         <!--      </van-field>-->
 
-        <van-field v-model="question"
-                   is-link
-                   readonly
-                   name="picker"
-                   clearable
-                   label="密保问题"
-                   left-icon="warn-o"
-                   placeholder="请点击选择问题"
-                   @click="showPicker = true"/>
-        <van-field v-model="params.answer"
-                   clearablelabel="问题答案"
-                   label="密保答案"
-                   left-icon="edit"
-                   placeholder="请输入问题答案"/>
-        <van-popup v-model:show="showPicker" position="bottom">
-          <van-picker :columns="columns"
-                      ref="pickerRef"
-                      @confirm="onConfirm"
-                      @cancel="showPicker=false"
-          />
-        </van-popup>
-      </van-cell-group>
+          <van-field v-model="question"
+                     is-link
+                     readonly
+                     name="picker"
+                     clearable
+                     label="密保问题"
+                     left-icon="warn-o"
+                     placeholder="请点击选择问题"
+                     @click="showPicker = true"/>
+          <van-field v-model="params.answer"
+                     clearablelabel="问题答案"
+                     label="密保答案"
+                     left-icon="edit"
+                     placeholder="请输入问题答案"/>
+          <van-popup v-model:show="showPicker" position="bottom">
+            <van-picker :columns="columns"
+                        ref="pickerRef"
+                        @confirm="onConfirm"
+                        @cancel="showPicker=false"
+            />
+          </van-popup>
+        </van-cell-group>
+      </van-form>
     </div>
 
     <div style="margin: 16px;">
@@ -205,8 +209,8 @@ export default {
       })
       console.log(this.params)
     },
-    change(){
-      if(this.params.password!==this.params.password2){
+    change() {
+      if (this.params.password !== this.params.password2) {
         showFailToast("两次密码不一致")
       }
     },
@@ -216,7 +220,7 @@ export default {
       const isPNG = file.type === 'image/png';
       const isGIF = file.type === 'image/gif';
 
-      console.log("图片类型："+file.type)
+      console.log("图片类型：" + file.type)
       const isLt1M = file.size / 1024 / 1024 < 1;
 
       if (!isJPG && !isPNG && !isGIF) {

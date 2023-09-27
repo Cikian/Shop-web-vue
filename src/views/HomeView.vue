@@ -85,7 +85,6 @@ export default {
     toDetail(goodId) {
       console.log("goodId" + goodId)
       this.$router.push({path: "/detail", query: {goodId: goodId}})
-
     }
   },
   watch: {

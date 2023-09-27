@@ -82,7 +82,7 @@ a:link {
             name="用户名"
             label="用户名"
             placeholder="用户名"
-            :rules="[{ required: true, message: '请填写用户名' },{pattern: /^[a-zA-Z0-9_-]{6,16}$/, message: '格式不正确'}]"
+            :rules="[{ required: true, message: '请填写用户名' },{pattern: /^[a-zA-Z0-9_-]{6,16}$/, message: '用户名格式不正确'}]"
         ></van-field>
         <van-field class="passwd"
                    v-model="params.password"
@@ -108,7 +108,7 @@ a:link {
   </div>
 
   <div style="margin: 45px auto; width:fit-content; font-size: 13px;font-family: PublicSans;">
-    <van-checkbox v-model="checked" checked-color="rgb(34,148,83)">我已阅读并同意《服务协议》和《隐私政策》
+    <van-checkbox v-model=checked checked-color="rgb(34,148,83)">我已阅读并同意《服务协议》和《隐私政策》
     </van-checkbox>
   </div>
 </template>
