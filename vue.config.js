@@ -4,6 +4,7 @@ const ComponentsPlugin = require('unplugin-vue-components/webpack');
 module.exports = {
   devServer: {
     port: 80,
+    proxy: 'http://localhost:8081'
   },
   transpileDependencies: true,
   configureWebpack: {

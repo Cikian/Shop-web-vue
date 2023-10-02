@@ -61,7 +61,9 @@
                      clearable
                      label="电话号码"
                      left-icon="phone-o"
-                     placeholder="请输入正确11位电话号码"/>
+                     placeholder="请输入正确11位电话号码"
+                      :rules="[{ required: true, message: '请填写电话号码' },{pattern: /^1[3456789]\d{9}$/, message: '手机号格式不正确'}]"
+          />
 
         <!--      <van-field v-model="sms" center clearable left-icon="comment-o" label="短信验证码" placeholder="请输入短信验证码">-->
         <!--        <template #button>-->
@@ -82,7 +84,9 @@
                      clearablelabel="问题答案"
                      label="密保答案"
                      left-icon="edit"
-                     placeholder="请输入问题答案"/>
+                     placeholder="请输入问题答案"
+                      :rules="[{ required: true, message: '请填写问题答案' }]"
+          />
           <van-popup v-model:show="showPicker" position="bottom">
             <van-picker :columns="columns"
                         ref="pickerRef"

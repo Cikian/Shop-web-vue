@@ -1,9 +1,9 @@
 <template>
-  <van-search placeholder="请输入搜索关键词"/>
+  <van-search v-model="searchText" placeholder="请输入搜索关键词" @search="onSearch"/>
 
 
-  <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
-<!--    <p>刷新次数: {{ count }}</p>-->
+  <van-pull-refresh v-model="refreshing" @refresh="onRefresh" style="margin-bottom: 10vh">
+
     <van-swipe :autoplay="3000" :lazy-render=true :style="{height:h}">
       <van-swipe-item v-for="image in images" :key="image">
         <img :src="image" :style="{height:h}"/>
@@ -29,6 +29,7 @@
 import {createApp, ref} from 'vue';
 import {Card, Lazyload, PullRefresh, Swipe, SwipeItem} from 'vant';
 import axios from "axios";
+import {store} from "@/store";
 
 const app = createApp();
 app.use(Swipe);
@@ -45,6 +46,7 @@ export default {
   data() {
     const active = ref(0);
     return {
+      store,
       active,
       h: '210px',
       goods: [],
@@ -55,6 +57,7 @@ export default {
         'https://fastly.jsdelivr.net/npm/@vant/assets/apple-1.jpeg',
         'https://fastly.jsdelivr.net/npm/@vant/assets/apple-2.jpeg',
       ],
+      searchText: '',
     };
   },
   mounted() {
@@ -67,11 +70,20 @@ export default {
   methods: {
     loadData() {
       let that = this;
-      axios.get('/good/').then(function (res) {
+      axios.get('/good/rec').then(function (res) {
             console.log(res);
             that.goods = res.data.data
             that.refreshing = false;
-          }
+          },
+          axios.get("/cart/count").then((res) => {
+            console.log(res)
+            if (res.data.code === 2001) {
+              this.store.cartCount = res.data.data;
+              console.log("获取购物车数量成功:" + this.store.cartCount)
+            } else {
+              console.log("获取购物车数量失败")
+            }
+          })
       )
     },
     onRefresh() {
@@ -85,7 +97,22 @@ export default {
     toDetail(goodId) {
       console.log("goodId" + goodId)
       this.$router.push({path: "/detail", query: {goodId: goodId}})
-    }
+    },
+    onSearch() {
+      if (this.searchText === '') {
+        this.loadData()
+        return
+      }
+      axios.get("/good/search/" + this.searchText).then((res) => {
+        console.log(res)
+        if (res.data.code === 2001) {
+          this.goods = res.data.data;
+          console.log("搜索成功:" + this.goods)
+        } else {
+          console.log("搜索失败")
+        }
+      })
+    },
   },
   watch: {
     handler(newValue, oldValue) {
