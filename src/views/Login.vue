@@ -1,32 +1,31 @@
 <style>
 #app {
-  --van-button-normal-font-size: 16px;
-  --van-nav-bar-text-color: rgb(34,150,83);
-  --van-nav-bar-icon-color: rgb(34,150,83);
+  --van-nav-bar-text-color: white;
+  --van-nav-bar-icon-color: white;
   --van-nav-bar-height: 60px;
   //--van-nav-bar-title-text-color:rgb(34,150,83);
 //--van-button-normal-font-family: ;
 }
 
 a {
-  color: rgba(34,148,83);
+  color: #70a875;
   font-size: 13px;
 }
 
 a:visited {
-  color: rgb(34,148,83);
+  color: #386b16;
 }
 
 a:hover {
-  color: rgb(34,148,83);
+  color: #5bae23;
 }
 
 a:active {
-  color: rgb(34,148,83);
+  color: #70a875;
 }
 
 a:link {
-  color: rgba(34,148,83, 0.76);
+  color: #70a875;
 }
 
 .login_form {
@@ -43,12 +42,8 @@ a:link {
 .tip {
 //margin-top: 25px; width: 200px;
   margin: 45px auto;
-}
+}s
 
-.nav {
-  box-shadow: 0 1px 10px 0 rgba(21, 35, 27, 0.1);
-  font-family: YouYuan;
-}
 
 
 .avatar{
@@ -95,7 +90,13 @@ a:link {
 
       </van-cell-group>
       <div style="font-family:PublicSans;margin: auto; margin-top: 25px; ">
-        <van-button round block type="primary" native-type="submit" color="rgba(34,148,83,0.67)" :disabled="!checked">
+        <van-button
+            round
+            block
+            type="primary"
+            native-type="submit"
+            color="#5bae23"
+            :disabled="!checked">
           登 录
         </van-button>
       </div>
@@ -108,7 +109,7 @@ a:link {
   </div>
 
   <div style="margin: 45px auto; width:fit-content; font-size: 13px;font-family: PublicSans;">
-    <van-checkbox v-model=checked checked-color="rgb(34,148,83)">我已阅读并同意《服务协议》和《隐私政策》
+    <van-checkbox v-model=checked checked-color="#70a875">我已阅读并同意<a>《服务协议》</a>和<a>《隐私政策》</a>
     </van-checkbox>
   </div>
 </template>
@@ -133,8 +134,6 @@ export default {
 
   mounted() {
     this.init()
-    console.log("是否登录：" + this.store.isLogin)
-    console.log("用户信息：" + this.store.userInfo)
   },
   data() {
     return {
@@ -149,14 +148,11 @@ export default {
     },
     // 页面数据初始化
     init() {
-      console.log("页面数据初始化")
       axios.get("/user/currentUser").then((res) => {
-        console.log("init:" + res)
         if (res.data.data != null) {
           this.store.userInfo = res.data.data
           this.store.isLogin = true
           sessionStorage.setItem("userInfo", JSON.stringify(res.data.data))
-          console.log(sessionStorage.getItem("userInfo"))
           // 刷新后，重定向至“我的”
           this.$router.push("/my")
         }
@@ -166,12 +162,10 @@ export default {
     login() {
       let that = this
       axios.post("/user/", this.params).then((res) => {
-        console.log(res)
         if (res.data.code === 6001) {
           this.store.userInfo = res.data.data
           sessionStorage.setItem("userInfo", JSON.stringify(res.data.data))
           showSuccessToast(res.data.msg)
-          console.log("session存："+JSON.stringify(res.data.data))
           this.store.isLogin = true
           // 两秒后跳转到首页
           setTimeout(function () {

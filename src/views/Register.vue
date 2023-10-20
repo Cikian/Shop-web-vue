@@ -8,6 +8,8 @@
   <div class="van-hairline--surround">
 
     <van-uploader v-model="fileList"
+                  upload-text="上传头像"
+                  upload-icon="photograph"
                   max-count="1"
                   style="margin-top: 45px"
                   :before-read="beforeRead"
@@ -21,9 +23,11 @@
 
     <!-- 可以使用 CellGroup 作为容器 -->
     <div class="register_form">
-      <van-form>
+      <van-form ref="regform">
         <van-cell-group inset>
           <van-field v-model="params.userName"
+                     name="username"
+                     @change="echange('username')"
                      label="用户名"
                      left-icon="user-circle-o"
                      placeholder="请输入用户名"
@@ -35,6 +39,8 @@
                      placeholder="请输入昵称，最大长度为16个字符"
           />
           <van-field v-model="params.password"
+                     name="passwd"
+                     @change="echange('passwd')"
                      clearable
                      label="密码"
                      left-icon="eye-o"
@@ -42,36 +48,37 @@
                      :rules="[{ required: true, message: '请填写密码'}]"
                      placeholder="请输入密码"/>
           <van-field v-model="params.password2"
+                     name="repasswd"
                      clearable
                      label="确认密码"
                      left-icon="eye-o"
                      placeholder="请再输入一遍密码"
                      type="password"
                      :rules="[{ required: true, message: '请再次填写密码' }]"
-                     @change="change"/>
+                     @change="change('repasswd')"/>
           <van-field v-model="params.email"
+                     name="email"
+                     @change="echange('email')"
                      clearable label="邮箱"
                      left-icon="envelop-o"
                      type="email"
                      placeholder="请输入邮箱"
-                      :rules="[{ required: true, message: '请填写邮箱' },{pattern: /^\w{1,64}@[a-z0-9\-]{1,256}(\.[a-z]{2,6}){1,2}$/, message: '邮箱格式不正确'}]"
+                     :rules="[{ required: true, message: '请填写邮箱' },{pattern: /^\w{1,64}@[a-z0-9\-]{1,256}(\.[a-z]{2,6}){1,2}$/, message: '邮箱格式不正确'}]"
           />
           <van-field v-model="params.phone"
+                     name="tel"
+                     @change="echange('tel')"
                      type="tel"
                      clearable
                      label="电话号码"
                      left-icon="phone-o"
                      placeholder="请输入正确11位电话号码"
-                      :rules="[{ required: true, message: '请填写电话号码' },{pattern: /^1[3456789]\d{9}$/, message: '手机号格式不正确'}]"
+                     :rules="[{ required: true, message: '请填写电话号码' },{pattern: /^1[3456789]\d{9}$/, message: '手机号格式不正确'}]"
           />
 
-        <!--      <van-field v-model="sms" center clearable left-icon="comment-o" label="短信验证码" placeholder="请输入短信验证码">-->
-        <!--        <template #button>-->
-        <!--          <van-button size="small" type="primary">发送验证码</van-button>-->
-        <!--        </template>-->
-        <!--      </van-field>-->
 
           <van-field v-model="question"
+                     @change="echange('picker')"
                      is-link
                      readonly
                      name="picker"
@@ -79,13 +86,17 @@
                      label="密保问题"
                      left-icon="warn-o"
                      placeholder="请点击选择问题"
+                     :rules="[{ required: true, message: '请选择密保问题' }]"
                      @click="showPicker = true"/>
+
           <van-field v-model="params.answer"
+                     name="ans"
+                     @change="echange('ans')"
                      clearablelabel="问题答案"
                      label="密保答案"
                      left-icon="edit"
                      placeholder="请输入问题答案"
-                      :rules="[{ required: true, message: '请填写问题答案' }]"
+                     :rules="[{ required: true, message: '请填写问题答案' }]"
           />
           <van-popup v-model:show="showPicker" position="bottom">
             <van-picker :columns="columns"
@@ -99,7 +110,8 @@
     </div>
 
     <div style="margin: 16px;">
-      <van-button round block type="primary" native-type="submit" @click="submit" color="rgba(34,148,83,0.67)">
+      <van-button :disabled="subDisable" round block type="primary" native-type="submit" @click="submit"
+                  color="rgba(34,148,83,0.67)">
         注册
       </van-button>
     </div>
@@ -113,10 +125,6 @@ import {store} from "@/store";
 import axios from "axios"
 import {ref} from "vue";
 import {showFailToast, showSuccessToast} from "vant";
-// const onCancel = () => showToast('取消');
-// const onChange = ({ selectedOptions }) => {
-//   showToast(`当前值: ${selectedOptions.join(',')}`);
-// };
 
 
 const columns = [{
@@ -176,6 +184,8 @@ export default {
         answer: ''
       },
 
+      subDisable: false,
+
 
       store,
       columns,
@@ -191,40 +201,74 @@ export default {
     onClickLeft() {
       this.$router.go(-1);
     },
-    submit() {
+    beforeSubmit() {
+      this.$refs.regform.validate().then(() => {
+        //验证成功
+        this.subDisable = false
+        return false
+      }).catch(() => {
+        //验证失败
+        this.subDisable = true
+        return true
+      })
+    },
+
+    relSubmit(){
       let that = this
       this.params.question = question
       axios.post("/user/register", this.params).then((res) => {
-        console.log(res)
         if (res.data.code === 3001) {
           this.store.userInfo = res.data.data
           // sessionStorage.setItem("userInfo",JSON.stringify(res.data.data))
           showSuccessToast(res.data.msg)
-          // console.log("session存："+JSON.stringify(res.data.data))
           // this.store.isLogin=true
           // 两秒后跳转到首页
           setTimeout(function () {
-            console.log("跳转")
             that.$router.push("/login")
           }, 2000)
         } else {
           showFailToast(res.data.msg)
         }
       })
-      console.log(this.params)
     },
-    change() {
+
+    submit() {
+      this.$refs.regform.validate().then(() => {
+        //验证成功
+        this.subDisable = false
+        this.relSubmit()
+      }).catch(() => {
+        //验证失败
+        this.subDisable = true
+      })
+
+
+    },
+    change(name) {
       if (this.params.password !== this.params.password2) {
         showFailToast("两次密码不一致")
       }
+      this.echange(name)
     },
+    echange(name) {
+      this.$refs.regform.validate(name).then(() => {
+      }).catch(() => {
+        //验证失败
+        this.subDisable = true
+        return
+      })
+
+
+      // 全部验证成功，解禁按钮
+      this.subDisable = false
+    },
+
     beforeRead(file) {
       // 仅支持jpg，png，gif格式的图片
       const isJPG = file.type === 'image/jpeg';
       const isPNG = file.type === 'image/png';
       const isGIF = file.type === 'image/gif';
 
-      console.log("图片类型：" + file.type)
       const isLt1M = file.size / 1024 / 1024 < 1;
 
       if (!isJPG && !isPNG && !isGIF) {
@@ -238,7 +282,6 @@ export default {
     afterRead(file) {
       let that = this
       // 此时可以自行将文件上传至服务器
-      console.log(file);
 
       //在这块创建FormData对象
       // FormData 对象的使用：
@@ -258,12 +301,9 @@ export default {
           "content-type": "multipart/form-data",
         },
       }).then((res) => {
-        //如果传入的响应状态码为200，则成功将文件发送给后台
+        //如果传入的响应状态码为1001，则成功将文件发送给后台
         if (res.data.code === 1001) {
-          console.log("上传成功!!!!!!!!!!!!!!!!!!!")
-          console.log(res);
           that.params.avatar = res.data.data.filePath
-          console.log(">>>>>>>头像地址：" + that.params.avatar)
           //this.imageData = res.data.showapi_res_body;
           //this.isShow = false;
           //this.showList = true;

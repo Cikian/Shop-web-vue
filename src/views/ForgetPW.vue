@@ -80,7 +80,6 @@ export default {
         if (res.data.code === 2001) {
           this.userInfo = res.data.data
           this.question = res.data.data.question
-          console.log(">>>>>>>>>>>>>>>>" + this.question)
           this.isPass = true
         } else {
           showFailToast(res.data.msg)
@@ -137,7 +136,7 @@ export default {
 
 .nav {
 
-  box-shadow: 0 1px 10px 0 rgba(21, 35, 27, 0.1);
+  //box-shadow: 0 1px 10px 0 rgba(21, 35, 27, 0.1);
 }
 
 *{

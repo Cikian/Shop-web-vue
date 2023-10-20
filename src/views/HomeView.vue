@@ -1,25 +1,35 @@
 <template>
   <van-search v-model="searchText" placeholder="请输入搜索关键词" @search="onSearch"/>
 
+  <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
 
-  <van-pull-refresh v-model="refreshing" @refresh="onRefresh" style="margin-bottom: 10vh">
-
-    <van-swipe :autoplay="3000" :lazy-render=true :style="{height:h}">
+    <van-swipe :autoplay="3000" :lazy-render=true style="height: 50vh">
       <van-swipe-item v-for="image in images" :key="image">
-        <img :src="image" :style="{height:h}"/>
+        <van-image :src="image" fit="cover" height="100%"/>
       </van-swipe-item>
     </van-swipe>
 
-    <van-card
-        :price="p.price"
-        :title="p.name"
-        :desc="p.subtitle"
-        :thumb="p.mainImage"
-        v-for="(p, index) in goods" :key="index"
-        @click="toDetail(p.goodId)"
-    >
-    </van-card>
+    <div class="bgc">
 
+      <van-divider
+          style="color: #15231b; font-family: YouYuan;letter-spacing: 10px;position: relative;top:10px;font-size: 18px">
+        <van-icon name="fire"/>
+        推荐商品
+      </van-divider>
+
+      <van-card
+          class="home-card"
+          :price="p.price"
+          :desc="p.subtitle"
+          :thumb="p.mainImage"
+          v-for="(p, index) in goods" :key="index"
+          @click="toDetail(p.goodId)"
+      >
+        <template #title>
+          <span style="positon:absolute;">{{ p.name }}</span>
+        </template>
+      </van-card>
+    </div>
   </van-pull-refresh>
 
 
@@ -46,6 +56,7 @@ export default {
   data() {
     const active = ref(0);
     return {
+      userInfo: {},
       store,
       active,
       h: '210px',
@@ -54,8 +65,11 @@ export default {
       count: 0,
       uname: "",
       images: [
-        'https://fastly.jsdelivr.net/npm/@vant/assets/apple-1.jpeg',
-        'https://fastly.jsdelivr.net/npm/@vant/assets/apple-2.jpeg',
+        'https://img-upyun.cikian.cn/develop/Shop-dev/20231011164830.png',
+        'https://img-upyun.cikian.cn/develop/Shop-dev/20231011165027.png',
+        'https://img-upyun.cikian.cn/develop/Shop-dev/20231011164909.png',
+        'https://img-upyun.cikian.cn/develop/Shop-dev/20231011165205.png',
+        'https://img-upyun.cikian.cn/develop/Shop-dev/8907ef6a813caa0987d079bc65e6976.jpg',
       ],
       searchText: '',
     };
@@ -66,36 +80,36 @@ export default {
     let picW = 750; //图片的宽
     let picH = 400; //图片的高
     this.h = Math.floor(picH * screenW / picW) + 'px';
+    this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
+    console.log("session 用户信息：" + JSON.stringify(this.userInfo))
+    if (this.userInfo != null) {
+      this.store.userInfo = this.userInfo
+      this.store.isLogin = true
+    }
   },
   methods: {
     loadData() {
       let that = this;
       axios.get('/good/rec').then(function (res) {
-            console.log(res);
             that.goods = res.data.data
             that.refreshing = false;
           },
           axios.get("/cart/count").then((res) => {
-            console.log(res)
             if (res.data.code === 2001) {
               this.store.cartCount = res.data.data;
-              console.log("获取购物车数量成功:" + this.store.cartCount)
             } else {
-              console.log("获取购物车数量失败")
             }
           })
       )
     },
     onRefresh() {
       setTimeout(() => {
-        console.log('刷新成功');
         this.count++;
         this.refreshing = false;
         this.loadData();
       }, 1000);
     },
     toDetail(goodId) {
-      console.log("goodId" + goodId)
       this.$router.push({path: "/detail", query: {goodId: goodId}})
     },
     onSearch() {
@@ -104,19 +118,15 @@ export default {
         return
       }
       axios.get("/good/search/" + this.searchText).then((res) => {
-        console.log(res)
         if (res.data.code === 2001) {
           this.goods = res.data.data;
-          console.log("搜索成功:" + this.goods)
         } else {
-          console.log("搜索失败")
         }
       })
     },
   },
   watch: {
     handler(newValue, oldValue) {
-      console.log(newValue, oldValue)
       this.loadData()
     },
   }
@@ -124,3 +134,51 @@ export default {
 }
 
 </script>
+
+<style>
+#app {
+  --van-card-desc-color: #c4c4c4;
+  --van-card-price-color: #ed5a65;
+  --van-search-background: linear-gradient(to right, #c1dfc4 0%, #deecdd 40%, #deecdd 60%, #c1dfc4 100%);
+}
+
+.bgc {
+  z-index: 0;
+  width: 100%;
+  background-image: url(../assets/pictures/bg4.png);
+  background-size: 100%;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+.home-card {
+  text-align: left;
+  border-radius: 20px;
+  width: 95vw;
+  height: 120px;
+  margin: 20px auto;
+  backdrop-filter: blur(9px);
+//background: linear-gradient(to bottom right, rgba(19, 60, 121, 0.5), rgba(168, 184, 199, 0.5)); background-color: rgba(222, 236, 221, 0.6);
+  -webkit-backdrop-filter: blur(8px);
+//box-shadow:0 0 3px 4px rgba(4, 4, 4, 0.8);
+}
+
+.home-card > .van-card__header > .van-card__content > div > span {
+  font-size: 16px;
+  color: #040404;
+}
+
+.van-card__bottom {
+  text-align: right;
+  margin-right: 5vw;
+  font-size: 28px;
+}
+
+.van-card__desc {
+  margin-top: 10px;
+  font-size: 13px;
+  color: rgba(44, 44, 44, 0.56);
+}
+
+
+</style>
